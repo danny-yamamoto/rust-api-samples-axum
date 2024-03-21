@@ -4,7 +4,7 @@ Implement Rust API with Axum.
 ## local database
 ```bash
 sudo apt-get update
-sudo apt-get install postgresql-client
+sudo apt-get install -y postgresql-client
 PGPASSWORD=postgres psql -h db -p  5432 -U postgres -d postgres
 psql -h db -p  5432 -U postgres -d postgres
 ```
