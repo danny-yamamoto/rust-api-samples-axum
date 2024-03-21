@@ -4,7 +4,7 @@ use tokio_postgres::NoTls;
 
 #[derive(Serialize)]
 pub struct User {
-    pub user_id: i64,
+    pub user_id: i32,
 }
 
 async fn users_fetch_data() -> Result<Vec<User>, Error> {
@@ -17,7 +17,7 @@ async fn users_fetch_data() -> Result<Vec<User>, Error> {
     let rows = client.query("select * from users", &[]).await.unwrap();
     let mut data = Vec::new();
     for row in &rows {
-        let user_id_to_row: i64 = row.get("user_id");
+        let user_id_to_row = row.get("user_id");
         let user_data = User { user_id: user_id_to_row };
         data.push(user_data);
     }
