@@ -1,3 +1,5 @@
+use std::env;
+
 use axum::{routing::get, Error, Json, Router};
 use serde::Serialize;
 use tokio_postgres::NoTls;
@@ -8,7 +10,9 @@ pub struct User {
 }
 
 async fn users_fetch_data() -> Result<Vec<User>, Error> {
-    let (client, connection) = tokio_postgres::connect("host=db user=postgres password=postgres port=5432 dbname=postgres", NoTls).await.unwrap();
+    let db_host = env::var("DB_HOST").expect("Failed to get DB_HOST");
+    let db_password = env::var("DB_PASSWORD").expect("Failed to get DB_PASSWORD");
+    let (client, connection) = tokio_postgres::connect(&format!("host={} user=postgres password={} port=5432 dbname=postgres", db_host, db_password), NoTls).await.unwrap();
     tokio::spawn(async move {
         if let Err(e) = connection.await {
             eprint!("Failed to connect: {}", e);
