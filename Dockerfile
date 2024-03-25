@@ -2,7 +2,7 @@
 FROM rust:latest as builder
 
 # 作業ディレクトリを設定します。
-WORKDIR /usr/src/myapp
+WORKDIR /usr/src/rust-api-samples-axum
 
 # 依存関係をキャッシュするために、Cargo.toml と Cargo.lock をコピーします。
 # ただし、Cargo.lock がない場合はスキップしてください。
@@ -14,7 +14,7 @@ RUN mkdir src/ && \
     echo "fn main() {println!(\"if you see this, the build broke\")}" > src/main.rs
 RUN cargo build --release
 
-RUN ls -la /usr/src/myapp
+RUN ls -la /usr/src/rust-api-samples-axum
 
 RUN ls -la target/release/
 
@@ -25,7 +25,7 @@ COPY ./src ./src
 RUN touch src/main.rs && \
     cargo build --release && \
     # バイナリを一時的な場所にコピーします。
-    cp target/release/myapp /usr/src/myapp/myapp
+    cp target/release/rust-api-samples-axum /usr/src/rust-api-samples-axum/rust-api-samples-axum
 
 # 実行ステージを設定します。ビルドステージでコンパイルしたバイナリを軽量なイメージにコピーします。
 FROM debian:12
@@ -34,9 +34,9 @@ FROM debian:12
 RUN apt-get update && apt-get install -y libssl-dev ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # ビルドステージからバイナリをコピーします。
-COPY --from=builder /usr/src/myapp/myapp .
+COPY --from=builder /usr/src/rust-api-samples-axum/rust-api-samples-axum .
 
 EXPOSE 80
 
 # アプリケーションを実行します。
-CMD ["./myapp"]
+CMD ["./rust-api-samples-axum"]
