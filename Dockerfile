@@ -1,32 +1,37 @@
-# Rust用のDockerイメージをベースにします
-FROM rust:latest AS builder
+# 使用するベースイメージを指定します。Rustの公式イメージを使用します。
+FROM rust:latest as builder
 
-# 作業ディレクトリを設定します
+# 作業ディレクトリを設定します。
 WORKDIR /usr/src/myapp
 
-# Rust依存関連ファイルをコピーします
-COPY Cargo.toml Cargo.lock ./
-COPY src ./src
+# 依存関係をキャッシュするために、Cargo.toml と Cargo.lock をコピーします。
+# ただし、Cargo.lock がない場合はスキップしてください。
+COPY Cargo.toml ./
 
-# 依存関係をビルドします（キャッシュを利用するために、バイナリのみをビルド）
-RUN --mount=type=cache,target=/usr/local/cargo/registry \
-    --mount=type=cache,target=/usr/src/myapp/target \
+# ダミーのソースファイルを作成して、依存関係だけをビルドします。
+# これにより、ソースコードの変更がない限り、依存関係の再コンパイルを避けられます。
+RUN mkdir src/ && \
+    echo "fn main() {println!(\"if you see this, the build broke\")}" > src/main.rs
+RUN cargo build --release
+
+# 本物のソースコードをコピーします。
+COPY ./src ./src
+
+# ダミーのソースファイルを削除して、本物のソースファイルでアプリケーションを再ビルドします。
+RUN touch src/main.rs && \
     cargo build --release
 
-# 実行可能なバイナリを取得します
-RUN mv target/release/myapp /usr/local/bin/myapp
+# 実行ステージを設定します。ビルドステージでコンパイルしたバイナリを軽量なイメージにコピーします。
+#FROM debian:buster-slim
+FROM debian:12
 
-# 実行用の軽量なDockerイメージをベースにします
-FROM debian:buster-slim
+# SSL証明書をインストールします。これは、外部APIとの安全な通信に必要な場合があります。
+RUN apt-get update && apt-get install -y libssl-dev ca-certificates && rm -rf /var/lib/apt/lists/*
 
-# 依存関係をインストールします
-RUN apt-get update && apt-get install -y libpq-dev
+# builder ステージからコンパイル済みバイナリをコピーします。
+COPY --from=builder /usr/src/myapp/target/release/myapp .
 
-# 実行可能なバイナリをコピーします
-COPY --from=builder /usr/local/bin/myapp /usr/local/bin/myapp
-
-# ポート3000を公開します（アプリケーションのポートに合わせて変更可能）
 EXPOSE 80
 
-# アプリケーションを実行します
-CMD ["myapp"]
+# アプリケーションを実行します。
+CMD ["./myapp"]
