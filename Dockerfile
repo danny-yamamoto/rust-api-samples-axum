@@ -14,7 +14,7 @@ RUN mkdir src/ && \
     echo "fn main() {println!(\"if you see this, the build broke\")}" > src/main.rs
 RUN cargo build --release
 
-RUN ls la /usr/src/myapp
+RUN ls -la /usr/src/myapp
 
 RUN ls -la target/release/
 
