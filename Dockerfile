@@ -1,3 +1,9 @@
+<div>
+<h1>Write down my daily learnings.</h1>
+<p align="center"><img src="./docs/sources/pencil.jpg" alt="price"></p>
+</div>
+
+
 # 使用するベースイメージを指定します。Rustの公式イメージを使用します。
 FROM rust:latest as builder
 
@@ -14,9 +20,9 @@ RUN mkdir src/ && \
     echo "fn main() {println!(\"if you see this, the build broke\")}" > src/main.rs
 RUN cargo build --release
 
-RUN ls -la　/usr/src/myapp
+RUN ls la /usr/src/myapp
 
-RUN ls -la　target/release/
+RUN ls -la target/release/
 
 # 本物のソースコードをコピーします。
 COPY ./src ./src
