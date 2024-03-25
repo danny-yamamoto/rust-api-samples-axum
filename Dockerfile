@@ -19,17 +19,18 @@ COPY ./src ./src
 
 # ダミーのソースファイルを削除して、本物のソースファイルでアプリケーションを再ビルドします。
 RUN touch src/main.rs && \
-    cargo build --release
+    cargo build --release && \
+    # バイナリを一時的な場所にコピーします。
+    cp target/release/myapp /usr/src/myapp/myapp
 
 # 実行ステージを設定します。ビルドステージでコンパイルしたバイナリを軽量なイメージにコピーします。
-#FROM debian:buster-slim
 FROM debian:12
 
 # SSL証明書をインストールします。これは、外部APIとの安全な通信に必要な場合があります。
 RUN apt-get update && apt-get install -y libssl-dev ca-certificates && rm -rf /var/lib/apt/lists/*
 
-# builder ステージからコンパイル済みバイナリをコピーします。
-COPY --from=builder /usr/src/myapp/target/release/myapp .
+# ビルドステージからバイナリをコピーします。
+COPY --from=builder /usr/src/myapp/myapp .
 
 EXPOSE 80
 
