@@ -1,5 +1,6 @@
 # 使用するベースイメージを指定します。Rustの公式イメージを使用します。
-FROM rust:latest as builder
+#FROM rust:latest as builder
+FROM public.ecr.aws/docker/library/rust:latest as builder
 
 # 作業ディレクトリを設定します。
 WORKDIR /usr/src/rust-api-samples-axum
@@ -28,7 +29,8 @@ RUN touch src/main.rs && \
     cp target/release/rust-api-samples-axum /usr/src/rust-api-samples-axum/rust-api-samples-axum
 
 # 実行ステージを設定します。ビルドステージでコンパイルしたバイナリを軽量なイメージにコピーします。
-FROM debian:12
+#FROM debian:12
+FROM public.ecr.aws/debian/debian:12
 
 # SSL証明書をインストールします。これは、外部APIとの安全な通信に必要な場合があります。
 RUN apt-get update && apt-get install -y libssl-dev ca-certificates && rm -rf /var/lib/apt/lists/*
