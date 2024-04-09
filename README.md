@@ -107,6 +107,8 @@ postgres=> \q
 
 ### Deploy app
 ```bash
+touch /workspaces/rust-api-samples-axum/local.pem
+chmod 700 /workspaces/rust-api-samples-axum/local.pem
 scp -i /workspaces/rust-api-samples-axum/local.pem /workspaces/rust-api-samples-axum/release ec2-user@ec2-x-x-x-x.compute-1.amazonaws.com:/home/ec2-user/release
 ```
 
