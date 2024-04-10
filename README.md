@@ -133,3 +133,49 @@ date: Fri, 22 Mar 2024 06:34:11 GMT
 [{"user_id":1},{"user_id":999}]
 [ec2-user@ip-172-31-24-240 ~]$ 
 ```
+
+## AWS SSM
+```bash
+curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
+sudo dpkg -i session-manager-plugin.deb
+session-manager-plugin
+```
+
+```bash
+@danny-yamamoto ➜ /workspaces/rust-api-samples-axum (main) $ session-manager-plugin
+
+The Session Manager plugin was installed successfully. Use the AWS CLI to start a session.
+
+@danny-yamamoto ➜ /workspaces/rust-api-samples-axum (main) $
+```
+
+```bash
+@danny-yamamoto ➜ /workspaces/rust-api-samples-axum (main) $ aws configure
+AWS Access Key ID [None]: yyyyy
+AWS Secret Access Key [None]: zzzzz
+Default region name [None]: us-east-1
+Default output format [None]: text
+@danny-yamamoto ➜ /workspaces/rust-api-samples-axum (main) $ 
+```
+https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/cli-chap-authentication.html
+https://zenn.dev/mo_ri_regen/articles/aws-cli-setting
+
+```bash
+export DEFAULT_REGION="us-east-1"
+export ECS_CLUSTER_NAME="arn:aws:ecs:us-east-1:999999999999:cluster/MyAppCluster"
+export ECS_SERVICE_NAME="arn:aws:ecs:us-east-1:999999999999:service/MyAppCluster/myapp-service-b"
+export ECS_TASK_NAME="arn:aws:ecs:us-east-1:999999999999:task/MyAppCluster/abcdefg"
+echo $DEFAULT_REGION
+echo $ECS_CLUSTER_NAME
+echo $ECS_SERVICE_NAME
+echo $ECS_TASK_NAME
+aws ecs list-clusters
+aws ecs list-tasks --cluster $ECS_CLUSTER_NAME
+aws ecs describe-tasks \
+    --cluster $ECS_CLUSTER_NAME \
+    --tasks $ECS_TASK_NAME
+aws ecs update-service --region $DEFAULT_REGION --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --enable-execute-command
+```
+
+### Install plugin
+- https://docs.aws.amazon.com/ja_jp/systems-manager/latest/userguide/install-plugin-debian-and-ubuntu.html
